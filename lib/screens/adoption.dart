@@ -52,7 +52,9 @@ class AdoptionScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(30 * animationValue),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black12,
+                  color: animationValue < 0.5
+                      ? Colors.transparent
+                      : Colors.black12,
                   blurRadius: 20,
                   spreadRadius: 10,
                 )

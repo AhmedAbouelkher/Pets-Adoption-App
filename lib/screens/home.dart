@@ -2,17 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pets_adoption_app/models/animal_categorys.dart';
 import 'package:pets_adoption_app/screens/adoption.dart';
-import 'package:pets_adoption_app/widgets/animal_category.dart';
-import 'package:pets_adoption_app/widgets/custom_home_appBar.dart';
-import 'package:pets_adoption_app/widgets/home_animal_card.dart';
 import 'package:pets_adoption_app/widgets/navigation.dart';
-import 'package:pets_adoption_app/widgets/search_field.dart';
 import 'package:provider/provider.dart';
 import 'package:response/response.dart';
-
 import 'dart:math' as math;
-
-import 'animal_info.dart';
 
 double degToRad(double angle) {
   return -angle * (math.pi / 180);
@@ -31,6 +24,7 @@ class _MasterScreenState extends State<MasterScreen>
     with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   Animation<double> _animation;
+  Animation<Color> _appBarColorTransAnimation;
   static double maxSlide = response.screenWidth * 0.60;
   double minDragStartEdge = 60;
   double maxDragStartEdge = maxSlide - 30;
@@ -39,7 +33,6 @@ class _MasterScreenState extends State<MasterScreen>
   @override
   void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
     _animationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 200));
     _animation = Tween<double>(begin: 0, end: 1).animate(
@@ -48,6 +41,15 @@ class _MasterScreenState extends State<MasterScreen>
         curve: Curves.easeOut,
       ),
     );
+    _appBarColorTransAnimation =
+        ColorTween(begin: Colors.grey[50], end: Color(0xff416C6E))
+            .animate(_animationController);
+  }
+
+  @override
+  void dispose() {
+    _animationController?.dispose();
+    super.dispose();
   }
 
   void close() => _animationController.reverse();
@@ -101,45 +103,67 @@ class _MasterScreenState extends State<MasterScreen>
         return true;
       },
       child: Scaffold(
-        body: AnimatedBuilder(
-          animation: _animation,
-          builder: (BuildContext context, Widget child) {
-            final double animationValue = _animation.value;
-            final double initialLeftPosition = 25;
-            final double contentScale = 1.0 - (0.3 * animationValue);
-            final double navigationTranslation = (1 - animationValue) * -200;
-            final double userAvatarTranslation = (1 - animationValue) * -350;
-            return Stack(
-              overflow: Overflow.visible,
-              children: <Widget>[
-                //background
-                Container(
-                  height: response.screenHeight,
-                  width: response.screenWidth,
-                  color: Color(0xff416C6E),
-                ),
-                //Adoption Screen
-                AdoptionScreen(
-                  animationValue: animationValue,
-                  contentScale: contentScale,
-                  animationController: _animationController,
-                  provider: provider,
-                  onHorizontalDragStart: _onDragStart,
-                  onHorizontalDragUpdate: _onDragUpdate,
-                  onHorizontalDragEnd: _onDragEnd,
-                ),
-                Navigation(
+        appBar: PreferredSize(
+          child: AnimatedBuilder(
+            animation: _appBarColorTransAnimation,
+            // child: child,
+            builder: (BuildContext context, Widget child) {
+              return AppBar(
+                backgroundColor: _appBarColorTransAnimation.value,
+                brightness: _appBarColorTransAnimation.isCompleted
+                    ? Brightness.dark
+                    : Brightness.light,
+                elevation: 0,
+              );
+            },
+          ),
+          preferredSize: Size.fromHeight(0),
+        ),
+        body: SafeArea(
+          bottom: false,
+          child: AnimatedBuilder(
+            animation: _animation,
+            builder: (BuildContext context, Widget child) {
+              final double animationValue = _animation.value;
+              final double initialLeftPosition = 25;
+              final double contentScale = 1.0 - (0.3 * animationValue);
+              final double navigationTranslation = (1 - animationValue) * -200;
+              final double userAvatarTranslation = (1 - animationValue) * -350;
+              return Stack(
+                overflow: Overflow.visible,
+                children: <Widget>[
+                  //background
+                  Container(
+                    height: response.screenHeight,
+                    width: response.screenWidth,
+                    color: Color(0xff416C6E),
+                  ),
+                  //Adoption Screen
+                  AdoptionScreen(
+                    animationValue: animationValue,
+                    contentScale: contentScale,
+                    animationController: _animationController,
+                    provider: provider,
+                    onHorizontalDragStart: _onDragStart,
+                    onHorizontalDragUpdate: _onDragUpdate,
+                    onHorizontalDragEnd: _onDragEnd,
+                  ),
+                  Navigation(
                     initialLeftPosition: initialLeftPosition,
-                    navigationTranslation: navigationTranslation),
-                UserQuickInfo(
+                    navigationTranslation: navigationTranslation,
+                  ),
+                  UserQuickInfo(
                     initialLeftPosition: initialLeftPosition,
-                    userAvatarTranslation: userAvatarTranslation),
-                Settings(
+                    userAvatarTranslation: userAvatarTranslation,
+                  ),
+                  Settings(
                     initialLeftPosition: initialLeftPosition,
-                    animationValue: animationValue)
-              ],
-            );
-          },
+                    animationValue: animationValue,
+                  )
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
