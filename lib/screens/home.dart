@@ -14,14 +14,12 @@ double degToRad(double angle) {
 var response = ResponseUI();
 
 class MasterScreen extends StatefulWidget {
-  static _MasterScreenState of(BuildContext context) =>
-      context.findAncestorStateOfType<_MasterScreenState>();
+  static _MasterScreenState of(BuildContext context) => context.findAncestorStateOfType<_MasterScreenState>();
   @override
   _MasterScreenState createState() => _MasterScreenState();
 }
 
-class _MasterScreenState extends State<MasterScreen>
-    with SingleTickerProviderStateMixin {
+class _MasterScreenState extends State<MasterScreen> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   Animation<double> _animation;
   Animation<Color> _appBarColorTransAnimation;
@@ -33,17 +31,14 @@ class _MasterScreenState extends State<MasterScreen>
   @override
   void initState() {
     super.initState();
-    _animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 200));
+    _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 200));
     _animation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: Curves.easeOut,
       ),
     );
-    _appBarColorTransAnimation =
-        ColorTween(begin: Colors.grey[50], end: Color(0xff416C6E))
-            .animate(_animationController);
+    _appBarColorTransAnimation = ColorTween(begin: Colors.grey[50], end: Color(0xff416C6E)).animate(_animationController);
   }
 
   @override
@@ -57,10 +52,8 @@ class _MasterScreenState extends State<MasterScreen>
   void toggleDrawer() => _animationController.isCompleted ? close() : open();
 
   void _onDragStart(DragStartDetails details) {
-    bool isDragOpenFromLeft = _animationController.isDismissed &&
-        details.globalPosition.dx < minDragStartEdge;
-    bool isDragCloseFromRight = _animationController.isCompleted &&
-        details.globalPosition.dx > maxDragStartEdge;
+    bool isDragOpenFromLeft = _animationController.isDismissed && details.globalPosition.dx < minDragStartEdge;
+    bool isDragCloseFromRight = _animationController.isCompleted && details.globalPosition.dx > maxDragStartEdge;
 
     _canBeDragged = isDragOpenFromLeft || isDragCloseFromRight;
   }
@@ -80,8 +73,7 @@ class _MasterScreenState extends State<MasterScreen>
       return;
     }
     if (details.velocity.pixelsPerSecond.dx.abs() >= _kMinFlingVelocity) {
-      double visualVelocity = details.velocity.pixelsPerSecond.dx /
-          MediaQuery.of(context).size.width;
+      double visualVelocity = details.velocity.pixelsPerSecond.dx / MediaQuery.of(context).size.width;
 
       _animationController.fling(velocity: visualVelocity);
     } else if (_animationController.value < 0.5) {
@@ -110,9 +102,7 @@ class _MasterScreenState extends State<MasterScreen>
             builder: (BuildContext context, Widget child) {
               return AppBar(
                 backgroundColor: _appBarColorTransAnimation.value,
-                brightness: _appBarColorTransAnimation.isCompleted
-                    ? Brightness.dark
-                    : Brightness.light,
+                brightness: _appBarColorTransAnimation.isCompleted ? Brightness.dark : Brightness.light,
                 elevation: 0,
               );
             },
